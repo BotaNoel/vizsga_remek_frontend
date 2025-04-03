@@ -29,43 +29,46 @@ export default {
                     console.error("Hiba a típusok lekérésekor:", error);
                 });
         },
+
         uploadApartment() {
             const authToken = localStorage.getItem("authToken");
 
             if (!authToken) {
-                console.error("Hiba: Nincs authToken tárolva!");
+                console.warn("Nincs auth token!");
                 return;
             }
+
+            const formData = {
+                name: this.apartment.name,
+                type_id: this.apartment.type_id,
+                max_capacity: this.apartment.max_capacity,
+                description: this.apartment.description,
+                price_per_night: this.apartment.price_per_night,
+            };
+
+            console.log("Küldött adatok:", formData);
 
             fetch("http://127.0.0.1:8000/api/apartments", {
                 method: "POST",
                 headers: {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${authToken}` // 🔹 Token hozzáadása
+                    "Authorization": `Bearer ${authToken}`
                 },
-                body: JSON.stringify({
-                    name: this.apartment.name,
-                    type_name: this.apartment.type_name,
-                    max_capacity: this.apartment.max_capacity,
-                    description: this.apartment.description,
-                    price_per_night: this.apartment.price_per_night
-                })
+                body: JSON.stringify(formData)
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.error) {
-                        console.error("Hiba:", data.error);
+                    if (data.errors) {
+                        console.error("Validációs hibák:", data.errors);
                     } else {
                         console.log("Sikeres feltöltés:", data);
                     }
                 })
                 .catch(error => {
-                    console.error("Hiba a feltöltés során:", error);
+                    console.error("Hiba az apartman feltöltésekor:", error);
                 });
         }
-
-
     }
 };
 </script>
